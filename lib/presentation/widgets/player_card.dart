@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_theme.dart';
 import '../../data/models/player_model.dart';
+import '../dialogs/full_screen_image_viewer.dart';
 
 /// Interactive Player Card displaying either opponent's photo or current user's mystery box.
 class PlayerCard extends StatelessWidget {
@@ -191,7 +192,7 @@ class PlayerCard extends StatelessWidget {
 
       // If revealed, show the actual photo!
       if (isRevealed) {
-        return _buildRevealedPhoto();
+        return _buildRevealedPhoto(context);
       }
 
       return Container(
@@ -201,44 +202,52 @@ class PlayerCard extends StatelessWidget {
           border: Border.all(color: AppTheme.accentPurple.withAlpha(150), width: 2),
         ),
         child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  color: AppTheme.accentPurple.withAlpha(60),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.help_outline_rounded,
-                  size: 48,
-                  color: Colors.white,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'MYSTERY PHOTO',
-                style: GoogleFonts.outfit(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 2,
-                  color: Colors.white,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Text(
-                  'Ask yes/no questions to guess what photo is on your head!',
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    color: Colors.white70,
+          child: SingleChildScrollView(
+            physics: const NeverScrollableScrollPhysics(),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppTheme.accentPurple.withAlpha(60),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.help_outline_rounded,
+                      size: 36,
+                      color: Colors.white,
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'MYSTERY PHOTO',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.outfit(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 2,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Text(
+                      'Ask yes/no questions to guess what photo is on your head!',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        color: Colors.white70,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       );
@@ -255,52 +264,65 @@ class PlayerCard extends StatelessWidget {
             ),
           ),
           child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.add_photo_alternate_rounded,
-                  size: 48,
-                  color: AppTheme.secondaryNeon,
+            child: SingleChildScrollView(
+              physics: const NeverScrollableScrollPhysics(),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.add_photo_alternate_rounded,
+                      size: 36,
+                      color: AppTheme.secondaryNeon,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Pick a Photo for ${player.displayName}',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.outfit(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Choose what they will have to guess',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        color: Colors.white60,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    ElevatedButton.icon(
+                      onPressed: isUploading ? null : onUploadPhoto,
+                      icon: isUploading
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Icon(Icons.upload_file_rounded, size: 18),
+                      label: Text(isUploading ? 'Uploading...' : 'Choose Photo'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.secondaryNeon,
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        textStyle: GoogleFonts.outfit(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 12),
-                Text(
-                  'Pick a Photo for ${player.displayName}',
-                  style: GoogleFonts.outfit(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  'Choose an object, character, or thing for them to guess',
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    color: Colors.white60,
-                  ),
-                ),
-                const SizedBox(height: 14),
-                ElevatedButton.icon(
-                  onPressed: isUploading ? null : onUploadPhoto,
-                  icon: isUploading
-                      ? const SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : const Icon(Icons.upload_file_rounded),
-                  label: Text(isUploading ? 'Uploading...' : 'Choose Photo'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.secondaryNeon,
-                    foregroundColor: Colors.black,
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         );
@@ -309,66 +331,120 @@ class PlayerCard extends StatelessWidget {
       // Display the actual photo for opponent
       return ClipRRect(
         borderRadius: BorderRadius.circular(18),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            CachedNetworkImage(
-              imageUrl: player.photoUrl!,
-              fit: BoxFit.cover,
-              placeholder: (context, url) => Container(
-                color: AppTheme.surfaceLight,
-                child: const Center(
-                  child: CircularProgressIndicator(
-                    color: AppTheme.secondaryNeon,
-                  ),
-                ),
-              ),
-              errorWidget: (context, url, error) => Container(
-                color: AppTheme.surfaceLight,
-                child: const Center(
-                  child: Icon(Icons.broken_image, color: Colors.white54, size: 40),
-                ),
-              ),
-            ),
-            // Bottom label banner
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.transparent,
-                      Colors.black.withAlpha(220),
-                    ],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.visibility_rounded,
-                      size: 14,
-                      color: AppTheme.secondaryNeon,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      '${player.displayName} needs to guess this!',
-                      style: GoogleFonts.inter(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () {
+              FullScreenImageViewer.show(
+                context,
+                imageUrl: player.photoUrl!,
+                title: "${player.displayName}'s Secret Photo",
+                subtitle: 'Tap or pinch to zoom in full size',
+              );
+            },
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                CachedNetworkImage(
+                  imageUrl: player.photoUrl!,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => Container(
+                    color: AppTheme.surfaceLight,
+                    child: const Center(
+                      child: CircularProgressIndicator(
+                        color: AppTheme.secondaryNeon,
                       ),
                     ),
-                  ],
+                  ),
+                  errorWidget: (context, url, error) => Container(
+                    color: AppTheme.surfaceLight,
+                    child: const Center(
+                      child: Icon(Icons.broken_image, color: Colors.white54, size: 40),
+                    ),
+                  ),
                 ),
-              ),
+                // Zoom hint badge
+                Positioned(
+                  top: 10,
+                  right: 10,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withAlpha(175),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: AppTheme.secondaryNeon.withAlpha(150),
+                        width: 1,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withAlpha(100),
+                          blurRadius: 8,
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.zoom_in_rounded,
+                          size: 15,
+                          color: AppTheme.secondaryNeon,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Zoom',
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                // Bottom label banner
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withAlpha(220),
+                        ],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.visibility_rounded,
+                          size: 14,
+                          color: AppTheme.secondaryNeon,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          '${player.displayName} needs to guess this!',
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       );
     }
@@ -386,28 +462,153 @@ class PlayerCard extends StatelessWidget {
         border: Border.all(color: Colors.white12, width: 1.5),
       ),
       child: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+        child: SingleChildScrollView(
+          physics: const NeverScrollableScrollPhysics(),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon, size: 32, color: Colors.white38),
+                const SizedBox(height: 8),
+                Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.outfit(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white70,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.inter(
+                    fontSize: 11,
+                    color: Colors.white38,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Shows the actual photo with a "REVEALED!" banner when host triggers reveal
+  Widget _buildRevealedPhoto(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(18),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            FullScreenImageViewer.show(
+              context,
+              imageUrl: player.photoUrl!,
+              title: 'Your Mystery Photo',
+              subtitle: 'Revealed! Tap or pinch to zoom in full size',
+            );
+          },
+          child: Stack(
+            fit: StackFit.expand,
             children: [
-              Icon(icon, size: 40, color: Colors.white38),
-              const SizedBox(height: 12),
-              Text(
-                title,
-                style: GoogleFonts.outfit(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white70,
+              CachedNetworkImage(
+                imageUrl: player.photoUrl!,
+                fit: BoxFit.cover,
+                placeholder: (context, url) => Container(
+                  color: AppTheme.surfaceLight,
+                  child: const Center(
+                    child: CircularProgressIndicator(
+                      color: AppTheme.accentGreen,
+                    ),
+                  ),
+                ),
+                errorWidget: (context, url, error) => Container(
+                  color: AppTheme.surfaceLight,
+                  child: const Center(
+                    child: Icon(Icons.broken_image, color: Colors.white54, size: 40),
+                  ),
                 ),
               ),
-              const SizedBox(height: 6),
-              Text(
-                subtitle,
-                textAlign: TextAlign.center,
-                style: GoogleFonts.inter(
-                  fontSize: 12,
-                  color: Colors.white38,
+              // Zoom hint badge
+              Positioned(
+                bottom: 10,
+                right: 10,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withAlpha(175),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: AppTheme.accentGreen.withAlpha(150),
+                      width: 1,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withAlpha(100),
+                        blurRadius: 8,
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.zoom_in_rounded,
+                        size: 15,
+                        color: AppTheme.accentGreen,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Zoom',
+                        style: GoogleFonts.inter(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              // REVEALED banner overlay
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        AppTheme.accentGreen.withAlpha(220),
+                        AppTheme.accentGreen.withAlpha(180),
+                      ],
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.visibility_rounded,
+                        size: 16,
+                        color: Colors.white,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        'REVEALED! This was your mystery photo!',
+                        style: GoogleFonts.outfit(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -417,75 +618,9 @@ class PlayerCard extends StatelessWidget {
     );
   }
 
-  /// Shows the actual photo with a "REVEALED!" banner when host triggers reveal
-  Widget _buildRevealedPhoto() {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(18),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          CachedNetworkImage(
-            imageUrl: player.photoUrl!,
-            fit: BoxFit.cover,
-            placeholder: (context, url) => Container(
-              color: AppTheme.surfaceLight,
-              child: const Center(
-                child: CircularProgressIndicator(
-                  color: AppTheme.accentGreen,
-                ),
-              ),
-            ),
-            errorWidget: (context, url, error) => Container(
-              color: AppTheme.surfaceLight,
-              child: const Center(
-                child: Icon(Icons.broken_image, color: Colors.white54, size: 40),
-              ),
-            ),
-          ),
-          // REVEALED banner overlay
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    AppTheme.accentGreen.withAlpha(220),
-                    AppTheme.accentGreen.withAlpha(180),
-                  ],
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.visibility_rounded,
-                    size: 16,
-                    color: Colors.white,
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    'REVEALED! This was your mystery photo!',
-                    style: GoogleFonts.outfit(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildFooter(BuildContext context, bool hasPhoto) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
         color: AppTheme.surfaceDark.withAlpha(120),
         borderRadius: const BorderRadius.vertical(bottom: Radius.circular(22)),
@@ -493,36 +628,45 @@ class PlayerCard extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              Icon(
-                hasPhoto ? Icons.check_circle_rounded : Icons.pending_rounded,
-                size: 16,
-                color: hasPhoto ? AppTheme.accentGreen : AppTheme.accentAmber,
-              ),
-              const SizedBox(width: 6),
-              Text(
-                hasPhoto ? 'Photo Ready' : 'Photo Pending',
-                style: GoogleFonts.inter(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
+          Flexible(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  hasPhoto ? Icons.check_circle_rounded : Icons.pending_rounded,
+                  size: 15,
                   color: hasPhoto ? AppTheme.accentGreen : AppTheme.accentAmber,
                 ),
-              ),
-            ],
+                const SizedBox(width: 6),
+                Flexible(
+                  child: Text(
+                    hasPhoto ? 'Photo Ready' : 'Photo Pending',
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: hasPhoto ? AppTheme.accentGreen : AppTheme.accentAmber,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
           ),
+          const SizedBox(width: 8),
           Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
               const Icon(
                 Icons.military_tech_rounded,
-                size: 18,
+                size: 16,
                 color: AppTheme.accentAmber,
               ),
               const SizedBox(width: 4),
               Text(
                 'Score: ${player.score}',
                 style: GoogleFonts.outfit(
-                  fontSize: 15,
+                  fontSize: 14,
                   fontWeight: FontWeight.w800,
                   color: AppTheme.accentAmber,
                 ),

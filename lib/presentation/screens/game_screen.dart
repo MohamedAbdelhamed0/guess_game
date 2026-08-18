@@ -101,6 +101,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
     return AppBar(
       title: RoomCodeBadge(roomCode: roomCode),
+      centerTitle: true,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back_ios_new_rounded),
         tooltip: 'Leave to Lobby',
@@ -109,38 +110,32 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       actions: [
         if (state.isHost && state.areBothPhotosReady && !state.isEnded)
           Padding(
-            padding: const EdgeInsets.only(right: 4),
-            child: TextButton.icon(
+            padding: const EdgeInsets.only(right: 6),
+            child: IconButton(
               onPressed: _handleRevealPhotos,
+              tooltip: state.isRevealed ? 'Hide Mystery Photos' : 'Reveal Mystery Photos',
+              style: IconButton.styleFrom(
+                backgroundColor: AppTheme.accentGreen.withAlpha(30),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
               icon: Icon(
                 state.isRevealed ? Icons.visibility_off_rounded : Icons.visibility_rounded,
                 color: AppTheme.accentGreen,
                 size: 20,
               ),
-              label: Text(
-                state.isRevealed ? 'Hide' : 'Reveal',
-                style: const TextStyle(color: AppTheme.accentGreen, fontWeight: FontWeight.bold),
-              ),
-              style: TextButton.styleFrom(
-                backgroundColor: AppTheme.accentGreen.withAlpha(25),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
             ),
           ),
         if (state.isHost)
           Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: TextButton.icon(
+            padding: const EdgeInsets.only(right: 10),
+            child: IconButton(
               onPressed: state.isEnded ? null : _handleEndGame,
-              icon: const Icon(Icons.stop_circle_outlined, color: AppTheme.accentRose, size: 20),
-              label: const Text(
-                'End Game',
-                style: TextStyle(color: AppTheme.accentRose, fontWeight: FontWeight.bold),
-              ),
-              style: TextButton.styleFrom(
-                backgroundColor: AppTheme.accentRose.withAlpha(25),
+              tooltip: 'End Game Room',
+              style: IconButton.styleFrom(
+                backgroundColor: AppTheme.accentRose.withAlpha(30),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
+              icon: const Icon(Icons.stop_circle_outlined, color: AppTheme.accentRose, size: 20),
             ),
           ),
       ],

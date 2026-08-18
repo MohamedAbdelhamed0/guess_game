@@ -27,7 +27,7 @@ class ScoreBoard extends ConsumerWidget {
     final scoreController = ref.read(scoreControllerProvider);
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
         color: AppTheme.surfaceDark,
         borderRadius: BorderRadius.circular(20),
@@ -71,7 +71,8 @@ class ScoreBoard extends ConsumerWidget {
 
               // VS Divider
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                margin: const EdgeInsets.symmetric(horizontal: 4),
                 decoration: BoxDecoration(
                   color: Colors.white10,
                   borderRadius: BorderRadius.circular(8),
@@ -79,7 +80,7 @@ class ScoreBoard extends ConsumerWidget {
                 child: Text(
                   'VS',
                   style: GoogleFonts.outfit(
-                    fontSize: 13,
+                    fontSize: 12,
                     fontWeight: FontWeight.w900,
                     color: Colors.white54,
                   ),
@@ -113,6 +114,7 @@ class ScoreBoard extends ConsumerWidget {
             const SizedBox(height: 10),
             Text(
               '👑 Host Controls: Tap +1 to award points for correct guesses',
+              textAlign: TextAlign.center,
               style: GoogleFonts.inter(
                 fontSize: 11,
                 color: Colors.white38,
@@ -140,7 +142,7 @@ class ScoreBoard extends ConsumerWidget {
                 child: Text(
                   isCurrentUser ? '${player.displayName} (You)' : player.displayName,
                   style: GoogleFonts.outfit(
-                    fontSize: 15,
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
                     color: isCurrentUser ? AppTheme.primaryNeon : AppTheme.secondaryNeon,
                   ),
@@ -151,40 +153,43 @@ class ScoreBoard extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 6),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (isHost)
-                _buildIconButton(
-                  icon: Icons.remove,
-                  onPressed: () => scoreController.decrementScore(roomId, player),
-                ),
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 10),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppTheme.surfaceLight,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: AppTheme.accentAmber.withAlpha(100),
-                    width: 1,
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (isHost)
+                  _buildIconButton(
+                    icon: Icons.remove,
+                    onPressed: () => scoreController.decrementScore(roomId, player),
+                  ),
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: AppTheme.surfaceLight,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: AppTheme.accentAmber.withAlpha(100),
+                      width: 1,
+                    ),
+                  ),
+                  child: Text(
+                    '${player.score}',
+                    style: GoogleFonts.outfit(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w900,
+                      color: AppTheme.accentAmber,
+                    ),
                   ),
                 ),
-                child: Text(
-                  '${player.score}',
-                  style: GoogleFonts.outfit(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w900,
-                    color: AppTheme.accentAmber,
+                if (isHost)
+                  _buildIconButton(
+                    icon: Icons.add,
+                    onPressed: () => scoreController.incrementScore(roomId, player),
                   ),
-                ),
-              ),
-              if (isHost)
-                _buildIconButton(
-                  icon: Icons.add,
-                  onPressed: () => scoreController.incrementScore(roomId, player),
-                ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
@@ -196,8 +201,8 @@ class ScoreBoard extends ConsumerWidget {
     required VoidCallback onPressed,
   }) {
     return Container(
-      width: 32,
-      height: 32,
+      width: 28,
+      height: 28,
       decoration: BoxDecoration(
         color: AppTheme.surfaceLight,
         borderRadius: BorderRadius.circular(8),
@@ -205,7 +210,7 @@ class ScoreBoard extends ConsumerWidget {
       ),
       child: IconButton(
         padding: EdgeInsets.zero,
-        iconSize: 18,
+        iconSize: 16,
         icon: Icon(icon, color: Colors.white),
         onPressed: onPressed,
       ),

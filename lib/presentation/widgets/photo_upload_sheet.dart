@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/image_utils.dart';
+import '../dialogs/full_screen_image_viewer.dart';
 
 /// Modal bottom sheet or dialog allowing user to pick and preview photo before uploading.
 class PhotoUploadSheet extends StatefulWidget {
@@ -167,25 +168,75 @@ class _PhotoUploadSheetState extends State<PhotoUploadSheet> {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(18),
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      Image.memory(
-                        _previewBytes!,
-                        fit: BoxFit.cover,
-                      ),
-                      Positioned(
-                        top: 8,
-                        right: 8,
-                        child: CircleAvatar(
-                          backgroundColor: Colors.black87,
-                          child: IconButton(
-                            icon: const Icon(Icons.refresh, color: Colors.white),
-                            onPressed: _isUploading ? null : _pickFromGallery,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () {
+                        FullScreenImageViewer.show(
+                          context,
+                          imageBytes: _previewBytes,
+                          title: 'Photo Preview',
+                          subtitle: 'Selected photo for ${widget.opponentName}',
+                        );
+                      },
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          Image.memory(
+                            _previewBytes!,
+                            fit: BoxFit.cover,
                           ),
-                        ),
+                          // Tap to zoom hint badge
+                          Positioned(
+                            top: 8,
+                            left: 8,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                              decoration: BoxDecoration(
+                                color: Colors.black87,
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: AppTheme.secondaryNeon.withAlpha(120),
+                                  width: 1,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(
+                                    Icons.zoom_in_rounded,
+                                    size: 15,
+                                    color: AppTheme.secondaryNeon,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    'Tap to Zoom',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          // Change photo button
+                          Positioned(
+                            top: 8,
+                            right: 8,
+                            child: CircleAvatar(
+                              backgroundColor: Colors.black87,
+                              child: IconButton(
+                                icon: const Icon(Icons.refresh, color: Colors.white),
+                                tooltip: 'Pick different image',
+                                onPressed: _isUploading ? null : _pickFromGallery,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               )

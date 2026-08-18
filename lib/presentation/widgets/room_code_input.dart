@@ -107,50 +107,45 @@ class RoomCodeBadge extends StatelessWidget {
           ),
         );
       },
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(12),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
           color: AppTheme.surfaceLight.withAlpha(200),
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: AppTheme.secondaryNeon.withAlpha(120),
             width: 1.2,
           ),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(
-              Icons.vpn_key_rounded,
-              size: 16,
-              color: AppTheme.secondaryNeon,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              'ROOM: ',
-              style: GoogleFonts.inter(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: Colors.white60,
-              ),
-            ),
-            Text(
-              roomCode,
-              style: GoogleFonts.outfit(
-                fontSize: 15,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 2,
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.vpn_key_rounded,
+                size: 15,
                 color: AppTheme.secondaryNeon,
               ),
-            ),
-            const SizedBox(width: 8),
-            const Icon(
-              Icons.copy_rounded,
-              size: 14,
-              color: Colors.white70,
-            ),
-          ],
+              const SizedBox(width: 6),
+              Text(
+                roomCode,
+                style: GoogleFonts.outfit(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 2,
+                  color: AppTheme.secondaryNeon,
+                ),
+              ),
+              const SizedBox(width: 6),
+              const Icon(
+                Icons.copy_rounded,
+                size: 13,
+                color: Colors.white70,
+              ),
+            ],
+          ),
         ),
       ),
     );
