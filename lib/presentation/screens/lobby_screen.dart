@@ -447,7 +447,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'thank u hana for the idea',
+              'thank u Hana for the idea',
               style: GoogleFonts.inter(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
