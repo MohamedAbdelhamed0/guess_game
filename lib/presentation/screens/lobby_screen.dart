@@ -116,7 +116,12 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
           // Rules Summary Card
           _buildRulesCard(),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
+
+          // Appreciation Footer
+          _buildAppreciationFooter(),
+
+          const SizedBox(height: 16),
         ],
       ),
     );
@@ -425,6 +430,38 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildAppreciationFooter() {
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+        decoration: BoxDecoration(
+          color: Colors.white.withAlpha(8),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.white.withAlpha(20)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'thank u hana for the idea',
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: Colors.white60,
+              ),
+            ),
+            const SizedBox(width: 6),
+            const Icon(
+              Icons.favorite_rounded,
+              size: 14,
+              color: AppTheme.accentRose,
+            ),
+          ],
+        ),
       ),
     );
   }
