@@ -14,6 +14,7 @@ import '../widgets/score_board.dart';
 /// Active game screen coordinating real-time players, photos, score, and host controls.
 class GameScreen extends ConsumerStatefulWidget {
   final String roomId;
+  static bool allowExit = false;
 
   const GameScreen({super.key, required this.roomId});
 
@@ -23,6 +24,12 @@ class GameScreen extends ConsumerStatefulWidget {
 
 class _GameScreenState extends ConsumerState<GameScreen> {
   bool _hasShownGameOverDialog = false;
+
+  @override
+  void initState() {
+    super.initState();
+    GameScreen.allowExit = false;
+  }
 
   void _showPhotoUploadModal(String opponentName) {
     PhotoUploadSheet.show(
@@ -95,6 +102,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               if (gameState.isHost) {
                 ref.read(gameControllerProvider(widget.roomId).notifier).endRoom();
               }
+              GameScreen.allowExit = true;
               context.go('/');
             },
             style: ElevatedButton.styleFrom(
@@ -205,7 +213,10 @@ class _GameScreenState extends ConsumerState<GameScreen> {
           GameOverDialog.show(
             context,
             players: next.players,
-            onBackToLobby: () => context.go('/'),
+            onBackToLobby: () {
+              GameScreen.allowExit = true;
+              context.go('/');
+            },
           );
         }
       },

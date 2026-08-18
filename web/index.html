@@ -30,12 +30,30 @@
   <link rel="manifest" href="manifest.json">
   <style>
     html, body {
-      overscroll-behavior-x: none;
-      overscroll-behavior-y: none;
-      overscroll-behavior: none;
-      touch-action: pan-y pinch-zoom;
+      overscroll-behavior-x: none !important;
+      overscroll-behavior-y: none !important;
+      overscroll-behavior: none !important;
+      touch-action: pan-y pinch-zoom !important;
     }
   </style>
+  <script>
+    // Prevent iOS and mobile browser edge swipe gesture back/forward
+    window.addEventListener('touchstart', function (e) {
+      if (e.touches && (e.touches[0].clientX < 35 || e.touches[0].clientX > window.innerWidth - 35)) {
+        // Only prevent when swiping from the edge
+        if (window.location.href.includes('/game/')) {
+          e.preventDefault();
+        }
+      }
+    }, { passive: false });
+
+    // Trap browser popstate back navigation when in active game
+    window.addEventListener('popstate', function (event) {
+      if (window.location.href.includes('/game/')) {
+        window.history.pushState(null, document.title, window.location.href);
+      }
+    });
+  </script>
 </head>
 <body>
   <!--
