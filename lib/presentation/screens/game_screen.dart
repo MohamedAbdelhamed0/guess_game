@@ -46,6 +46,68 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     );
   }
 
+  void _showLeaveWarningDialog() {
+    final gameState = ref.read(gameControllerProvider(widget.roomId));
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppTheme.surfaceDark,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(22),
+          side: const BorderSide(color: AppTheme.accentRose, width: 1.5),
+        ),
+        title: Row(
+          children: [
+            const Icon(Icons.warning_amber_rounded, color: AppTheme.accentRose, size: 28),
+            const SizedBox(width: 10),
+            Text(
+              gameState.isHost ? 'End the Game?' : 'Leave the Game?',
+              style: GoogleFonts.outfit(
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          gameState.isHost
+              ? 'Are you sure you want to leave and end the game? The game room will close for both players.'
+              : 'Are you sure you want to leave this game room? You will disconnect from the match.',
+          style: GoogleFonts.inter(
+            color: Colors.white70,
+            fontSize: 14,
+            height: 1.4,
+          ),
+        ),
+        actionsPadding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text(
+              'Stay in Game',
+              style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              if (gameState.isHost) {
+                ref.read(gameControllerProvider(widget.roomId).notifier).endRoom();
+              }
+              context.go('/');
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.accentRose,
+              foregroundColor: Colors.white,
+            ),
+            child: Text(gameState.isHost ? 'End & Leave' : 'Leave Game'),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _handleResetPhotos() {
     showDialog(
       context: context,
@@ -149,11 +211,12 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       },
     );
 
-    // PopScope prevents back button / back gesture from navigating away
+    // PopScope prevents back button / back gesture from navigating away accidentally
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
+        _showLeaveWarningDialog();
       },
       child: Scaffold(
         appBar: _buildAppBar(gameState),
