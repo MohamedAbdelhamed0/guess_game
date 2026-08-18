@@ -46,6 +46,79 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     );
   }
 
+  void _handleResetPhotos() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppTheme.surfaceDark,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(22),
+          side: BorderSide(color: AppTheme.secondaryNeon.withAlpha(120), width: 1.5),
+        ),
+        title: Row(
+          children: [
+            const Icon(Icons.replay_rounded, color: AppTheme.secondaryNeon, size: 26),
+            const SizedBox(width: 10),
+            Text(
+              'Next Round?',
+              style: GoogleFonts.outfit(
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          'Reset photos so both players can upload new photos for the next round. Current scores are kept!',
+          style: GoogleFonts.inter(
+            color: Colors.white70,
+            fontSize: 13,
+            height: 1.4,
+          ),
+        ),
+        actionsPadding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel', style: TextStyle(color: Colors.white60)),
+          ),
+          ElevatedButton.icon(
+            onPressed: () async {
+              Navigator.of(ctx).pop();
+              await ref
+                  .read(gameControllerProvider(widget.roomId).notifier)
+                  .resetPhotosForNextRound();
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Row(
+                      children: [
+                        Icon(Icons.check_circle, color: AppTheme.secondaryNeon),
+                        SizedBox(width: 10),
+                        Text('Photos reset! Upload new photos for the next round.'),
+                      ],
+                    ),
+                    backgroundColor: AppTheme.surfaceDark,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                );
+              }
+            },
+            icon: const Icon(Icons.replay_rounded, size: 18),
+            label: const Text('Reset Photos'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.secondaryNeon,
+              foregroundColor: Colors.black,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _handleRevealPhotos() {
     final gameState = ref.read(gameControllerProvider(widget.roomId));
     final notifier = ref.read(gameControllerProvider(widget.roomId).notifier);
@@ -76,21 +149,28 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       },
     );
 
-    return Scaffold(
-      appBar: _buildAppBar(gameState),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: RadialGradient(
-            center: Alignment(0, -0.3),
-            radius: 1.3,
-            colors: [
-              Color(0xFF1E1B4B),
-              AppTheme.backgroundDark,
-            ],
+    // PopScope prevents back button / back gesture from navigating away
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+      },
+      child: Scaffold(
+        appBar: _buildAppBar(gameState),
+        body: Container(
+          decoration: const BoxDecoration(
+            gradient: RadialGradient(
+              center: Alignment(0, -0.3),
+              radius: 1.3,
+              colors: [
+                Color(0xFF1E1B4B),
+                AppTheme.backgroundDark,
+              ],
+            ),
           ),
-        ),
-        child: SafeArea(
-          child: _buildBody(gameState),
+          child: SafeArea(
+            child: _buildBody(gameState),
+          ),
         ),
       ),
     );
@@ -98,16 +178,14 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
   PreferredSizeWidget _buildAppBar(GameState state) {
     final roomCode = state.room?.roomCode ?? '------';
+    final hasAnyPhotos = state.players.any((p) => p.hasPhoto);
 
     return AppBar(
+      automaticallyImplyLeading: false, // Disabled back button navigation
       title: RoomCodeBadge(roomCode: roomCode),
       centerTitle: true,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios_new_rounded),
-        tooltip: 'Leave to Lobby',
-        onPressed: () => context.go('/'),
-      ),
       actions: [
+        // 1. Reveal / Hide Photos (when host and photos are ready)
         if (state.isHost && state.areBothPhotosReady && !state.isEnded)
           Padding(
             padding: const EdgeInsets.only(right: 6),
@@ -125,6 +203,27 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               ),
             ),
           ),
+
+        // 2. Next Round / Reset Photos button for host
+        if (state.isHost && (hasAnyPhotos || state.isRevealed) && !state.isEnded)
+          Padding(
+            padding: const EdgeInsets.only(right: 6),
+            child: IconButton(
+              onPressed: _handleResetPhotos,
+              tooltip: 'Reset Photos (Next Round)',
+              style: IconButton.styleFrom(
+                backgroundColor: AppTheme.secondaryNeon.withAlpha(30),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              icon: const Icon(
+                Icons.replay_rounded,
+                color: AppTheme.secondaryNeon,
+                size: 20,
+              ),
+            ),
+          ),
+
+        // 3. End Game button
         if (state.isHost)
           Padding(
             padding: const EdgeInsets.only(right: 10),
@@ -302,6 +401,19 @@ class _GameScreenState extends ConsumerState<GameScreen> {
             currentUserId: state.currentUserId,
             isHost: state.isHost,
           ),
+          if (state.isHost && state.isRevealed) ...[
+            const SizedBox(height: 12),
+            ElevatedButton.icon(
+              onPressed: _handleResetPhotos,
+              icon: const Icon(Icons.replay_rounded, color: Colors.black),
+              label: const Text('Start Next Round (Reset Photos)'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.secondaryNeon,
+                foregroundColor: Colors.black,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+              ),
+            ),
+          ],
           const SizedBox(height: 16),
 
           // 2. Opponent's Card (The photo YOU see and they have to guess)
@@ -352,7 +464,22 @@ class _GameScreenState extends ConsumerState<GameScreen> {
             currentUserId: state.currentUserId,
             isHost: state.isHost,
           ),
-          const SizedBox(height: 20),
+          if (state.isHost && state.isRevealed) ...[
+            const SizedBox(height: 12),
+            Center(
+              child: ElevatedButton.icon(
+                onPressed: _handleResetPhotos,
+                icon: const Icon(Icons.replay_rounded, color: Colors.black),
+                label: const Text('Start Next Round (Reset Photos)'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.secondaryNeon,
+                  foregroundColor: Colors.black,
+                  padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+                ),
+              ),
+            ),
+          ],
+          const SizedBox(height: 16),
 
           // 2. Side-by-Side Dual Player Arena
           Expanded(

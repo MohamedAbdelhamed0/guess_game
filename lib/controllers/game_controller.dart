@@ -226,6 +226,21 @@ class GameNotifier extends StateNotifier<GameState> {
     }
   }
 
+  /// Host resets photos for both players to start a new round
+  Future<void> resetPhotosForNextRound() async {
+    if (!state.isHost) return;
+    try {
+      // 1. Hide photos
+      await _roomRepo.updateRoomRevealed(roomId, false);
+      // 2. Set room status back to waiting for photos
+      await _roomRepo.updateRoomStatus(roomId, SupabaseConstants.statusWaiting);
+      // 3. Clear photo_url for all players in the room
+      await _playerRepo.resetRoomPhotos(roomId);
+    } catch (e) {
+      state = state.copyWith(errorMessage: 'Failed to reset photos: $e');
+    }
+  }
+
   @override
   void dispose() {
     _roomSubscription?.cancel();

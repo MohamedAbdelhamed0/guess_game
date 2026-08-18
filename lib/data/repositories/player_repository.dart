@@ -27,6 +27,10 @@ class PlayerRepository {
     );
   }
 
+  /// Reset photos for all players in a room (start next round)
+  Future<void> resetRoomPhotos(String roomId) =>
+      _playerDataSource.resetPlayersPhotos(roomId);
+
   /// Update a player's score
   Future<void> updateScore({
     required String playerId,

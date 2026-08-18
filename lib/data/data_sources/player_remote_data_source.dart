@@ -100,6 +100,19 @@ class PlayerRemoteDataSource {
     }
   }
 
+  /// Reset photos for all players in a room (for starting a new round)
+  Future<void> resetPlayersPhotos(String roomId) async {
+    try {
+      await _safeClient
+          .from(SupabaseConstants.playersTable)
+          .update({'photo_url': null})
+          .eq('room_id', roomId);
+    } catch (e) {
+      debugPrint('Error resetting player photos: $e');
+      rethrow;
+    }
+  }
+
   /// Update a player's score
   Future<void> updatePlayerScore({
     required String playerId,
